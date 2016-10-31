@@ -52,7 +52,7 @@ Head over to [test/README.md](https://github.com/webrtc/samples/blob/gh-pages/te
 
 ### Devices ###
 
-[Select camera, microphone and speaker](https://webrtc.github.io/samples/src/content/devices/input-output/)
+[Select camera, microphone and speaker](https://hyukmin-kwon.github.io/webrtc_ar_test1/src/content/devices/input-output/)
 
 [Select media source and audio output](https://webrtc.github.io/samples/src/content/devices/multi/)
 
