@@ -189,7 +189,7 @@ tick();
 var cameraParam = new ARCameraParam();
 cameraParam.onload = function() {
 
-	arController = new ARController(640, 480, cameraParam);
+	arController = new ARController(480, 360, cameraParam);
 	arController.debugSetup();
 
 	var camera_mat = arController.getCameraMatrix();
