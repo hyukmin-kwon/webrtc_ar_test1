@@ -160,12 +160,12 @@ function tick() {
 
 	arController.detectMarker(video);
 	var markerNum = arController.getMarkerNum();
+    var visible = false;
 	if (markerNum > 0) {
         for (var i = 0; i < markerNum; i++) {
-            markerRoot.visible = true;
             var marker = arController.getMarker(i);
             if (marker.idMatrix === 1) {
-                markerRoot.visible = true;
+                visible = true;
                 /*if (markerRoot.visible) {
                     arController.getTransMatSquareCont(i, 1, markerRoot.markerMatrix, markerRoot.markerMatrix);
                 } else */{
@@ -178,10 +178,8 @@ function tick() {
                 }
             }
         }
-	} else {
-		markerRoot.visible = true;
 	}
-
+    markerRoot.visible = visible;
 	arController.debugDraw();
 
 	// Render the scene.
