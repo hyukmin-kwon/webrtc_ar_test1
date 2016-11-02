@@ -96,7 +96,7 @@
     var cMat = new THREE.Matrix4();
     var tMat = new THREE.Matrix4();
 
-    var USE_SHADER = true;
+    var USE_SHADER = false;
 
     var shaderMaterial = new THREE.ShaderMaterial({
         uniforms: {
@@ -127,25 +127,32 @@
     light.position.set(-400, -500, -100);
     scene.add(light);
 
-    var markerRoot = new THREE.Object3D();
+    var markerRootsNum = 5;
+    var markerRoots = [];
+    for (i = 0; i < markerRootsNum; i++) {
+        var markerRoot = new THREE.Object3D();
 
-    markerRoot.wasVisible = false;
-    markerRoot.markerMatrix = new Float64Array(12);
-    markerRoot.matrixAutoUpdate = false;
+        markerRoot.wasVisible = false;
+        markerRoot.markerMatrix = new Float64Array(12);
+        markerRoot.matrixAutoUpdate = false;
+        markerRoots.push(markerRoot);
+    }
     camera.matrixAutoUpdate = false;
 
     // Add the marker models and suchlike into your marker root object.
+    for (i = 0; i < markerRootsNum; i++) {
+        var cube = new THREE.Mesh(
+            new THREE.BoxGeometry(1,1,(i + 1)/ markerRootsNum),
+            USE_SHADER ?
+                shaderMaterial :
+                new THREE.MeshLambertMaterial({ color: 0xffffff, wireframe: false })
+        );
+        markerRoots[i].add(cube);
+    }
 
-    var cube = new THREE.Mesh(
-        new THREE.BoxGeometry(1,1,1),
-        USE_SHADER ?
-            shaderMaterial :
-            new THREE.MeshLambertMaterial({ color: 0xffffff, wireframe: false })
-    );
-    markerRoot.add(cube);
 
     // Add the marker root to your scene.
-    scene.add(markerRoot);
+    markerRoots.forEach(function (markerRoot){scene.add(markerRoot);});
     var arController = null;
 
 
@@ -160,26 +167,27 @@
 
         arController.detectMarker(video);
         var markerNum = arController.getMarkerNum();
-        var visible = false;
+        var visible = [];
+        for (i = 0; i < markerRootsNum; i++) {
+            visible.push(false);
+        }
         if (markerNum > 0) {
             for (var i = 0; i < markerNum; i++) {
                 var marker = arController.getMarker(i);
-                if (marker.idMatrix === 1) {
-                    visible = true;
-                    /*if (markerRoot.visible) {
-                        arController.getTransMatSquareCont(i, 1, markerRoot.markerMatrix, markerRoot.markerMatrix);
-                    } else */{
-                        arController.getTransMatSquare(i /* Marker index */, 1 /* Marker width */, markerRoot.markerMatrix);
-                    }
+                if (marker.idMatrix >= 0 && marker.idMatrix < markerRootsNum) {
+                    visible[marker.idMatrix] = true;
+                    arController.getTransMatSquare(i /* Marker index */, 1 /* Marker width */, markerRoots[marker.idMatrix].markerMatrix);
                     if (USE_SHADER) {
-                        arController.transMatToGLMat(markerRoot.markerMatrix, shaderMaterial.uniforms.transformationMatrix.value.elements);
+                        arController.transMatToGLMat(markerRoots[marker.idMatrix].markerMatrix, shaderMaterial.uniforms.transformationMatrix.value.elements);
                     } else {
-                        arController.transMatToGLMat(markerRoot.markerMatrix, markerRoot.matrix.elements);
+                        arController.transMatToGLMat(markerRoots[marker.idMatrix].markerMatrix, markerRoots[marker.idMatrix].matrix.elements);
                     }
                 }
             }
         }
-        markerRoot.visible = visible;
+        for (i = 0; i < markerRootsNum; i++) {
+            markerRoots[i].visible = visible[i];
+        }
         arController.debugDraw();
 
         // Render the scene.
