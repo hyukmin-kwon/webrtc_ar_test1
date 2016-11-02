@@ -162,7 +162,7 @@ function tick() {
 	var markerNum = arController.getMarkerNum();
 	if (markerNum > 0) {
         for (var i = 0; i < markerNum; i++) {
-            markerRoot.visible = false;
+            markerRoot.visible = true;
             var marker = arController.getMarker(i);
             if (marker.idMatrix === 1) {
                 markerRoot.visible = true;
@@ -179,7 +179,7 @@ function tick() {
             }
         }
 	} else {
-		markerRoot.visible = false;
+		markerRoot.visible = true;
 	}
 
 	arController.debugDraw();
