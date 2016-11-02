@@ -92,123 +92,123 @@
 
   <!--  From JSARToolkit begin -->
 <script>
+function () {
+    var cMat = new THREE.Matrix4();
+    var tMat = new THREE.Matrix4();
 
-var cMat = new THREE.Matrix4();
-var tMat = new THREE.Matrix4();
+    var USE_SHADER = true;
 
-var USE_SHADER = true;
-
-var shaderMaterial = new THREE.ShaderMaterial({
-	uniforms: {
-		cameraMatrix: {type: 'm4', value: cMat },
-		transformationMatrix: {type: 'm4', value: tMat }
-	},
-	vertexShader: vert.text,
-	fragmentShader: frag.text
-});
-
-
-var renderer = new THREE.WebGLRenderer();
-var scene = new THREE.Scene();
-
-var video = document.getElementById('video');
-renderer.setSize(video.width, video.height);
-
-document.body.appendChild(renderer.domElement);
-
-// Create a camera and a marker root object for your Three.js scene.
-var camera = new THREE.Camera();
-scene.add(camera);
-
-var light = new THREE.PointLight(0xffffff);
-light.position.set(400, 500, 100);
-scene.add(light);
-var light = new THREE.PointLight(0xffffff);
-light.position.set(-400, -500, -100);
-scene.add(light);
-
-var markerRoot = new THREE.Object3D();
-
-markerRoot.wasVisible = false;
-markerRoot.markerMatrix = new Float64Array(12);
-markerRoot.matrixAutoUpdate = false;
-camera.matrixAutoUpdate = false;
-
-// Add the marker models and suchlike into your marker root object.
-
-var cube = new THREE.Mesh(
-	new THREE.BoxGeometry(1,1,1),
-	USE_SHADER ?
-		shaderMaterial :
-		new THREE.MeshLambertMaterial({ color: 0xffffff, wireframe: false })
-);
-markerRoot.add(cube);
-
-// Add the marker root to your scene.
-scene.add(markerRoot);
-var arController = null;
+    var shaderMaterial = new THREE.ShaderMaterial({
+        uniforms: {
+            cameraMatrix: {type: 'm4', value: cMat },
+            transformationMatrix: {type: 'm4', value: tMat }
+        },
+        vertexShader: vert.text,
+        fragmentShader: frag.text
+    });
 
 
+    var renderer = new THREE.WebGLRenderer();
+    var scene = new THREE.Scene();
 
-// On every frame do the following:
-function tick() {
-	requestAnimationFrame(tick);
+    var video = document.getElementById('video');
+    renderer.setSize(video.width, video.height);
 
-	if (!arController) {
-		return;
-	}
+    document.body.appendChild(renderer.domElement);
 
-	arController.detectMarker(video);
-	var markerNum = arController.getMarkerNum();
-    var visible = false;
-	if (markerNum > 0) {
-        for (var i = 0; i < markerNum; i++) {
-            var marker = arController.getMarker(i);
-            if (marker.idMatrix === 1) {
-                visible = true;
-                /*if (markerRoot.visible) {
-                    arController.getTransMatSquareCont(i, 1, markerRoot.markerMatrix, markerRoot.markerMatrix);
-                } else */{
-                    arController.getTransMatSquare(i /* Marker index */, 1 /* Marker width */, markerRoot.markerMatrix);
-                }
-                if (USE_SHADER) {
-                    arController.transMatToGLMat(markerRoot.markerMatrix, shaderMaterial.uniforms.transformationMatrix.value.elements);
-                } else {
-                    arController.transMatToGLMat(markerRoot.markerMatrix, markerRoot.matrix.elements);
+    // Create a camera and a marker root object for your Three.js scene.
+    var camera = new THREE.Camera();
+    scene.add(camera);
+
+    var light = new THREE.PointLight(0xffffff);
+    light.position.set(400, 500, 100);
+    scene.add(light);
+    var light = new THREE.PointLight(0xffffff);
+    light.position.set(-400, -500, -100);
+    scene.add(light);
+
+    var markerRoot = new THREE.Object3D();
+
+    markerRoot.wasVisible = false;
+    markerRoot.markerMatrix = new Float64Array(12);
+    markerRoot.matrixAutoUpdate = false;
+    camera.matrixAutoUpdate = false;
+
+    // Add the marker models and suchlike into your marker root object.
+
+    var cube = new THREE.Mesh(
+        new THREE.BoxGeometry(1,1,1),
+        USE_SHADER ?
+            shaderMaterial :
+            new THREE.MeshLambertMaterial({ color: 0xffffff, wireframe: false })
+    );
+    markerRoot.add(cube);
+
+    // Add the marker root to your scene.
+    scene.add(markerRoot);
+    var arController = null;
+
+
+
+    // On every frame do the following:
+    function tick() {
+        requestAnimationFrame(tick);
+
+        if (!arController) {
+            return;
+        }
+
+        arController.detectMarker(video);
+        var markerNum = arController.getMarkerNum();
+        var visible = false;
+        if (markerNum > 0) {
+            for (var i = 0; i < markerNum; i++) {
+                var marker = arController.getMarker(i);
+                if (marker.idMatrix === 1) {
+                    visible = true;
+                    /*if (markerRoot.visible) {
+                        arController.getTransMatSquareCont(i, 1, markerRoot.markerMatrix, markerRoot.markerMatrix);
+                    } else */{
+                        arController.getTransMatSquare(i /* Marker index */, 1 /* Marker width */, markerRoot.markerMatrix);
+                    }
+                    if (USE_SHADER) {
+                        arController.transMatToGLMat(markerRoot.markerMatrix, shaderMaterial.uniforms.transformationMatrix.value.elements);
+                    } else {
+                        arController.transMatToGLMat(markerRoot.markerMatrix, markerRoot.matrix.elements);
+                    }
                 }
             }
         }
-	}
-    markerRoot.visible = visible;
-	arController.debugDraw();
+        markerRoot.visible = visible;
+        arController.debugDraw();
 
-	// Render the scene.
-	renderer.autoClear = false;
-	renderer.clear();
-	renderer.render(scene, camera);
-}
+        // Render the scene.
+        renderer.autoClear = false;
+        renderer.clear();
+        renderer.render(scene, camera);
+    }
 
-tick();
+    tick();
 
-var cameraParam = new ARCameraParam();
-cameraParam.onload = function() {
+    var cameraParam = new ARCameraParam();
+    cameraParam.onload = function() {
 
-	arController = new ARController(480, 360, cameraParam);
-    arController.setPatternDetectionMode(artoolkit.AR_MATRIX_CODE_DETECTION);
-	arController.debugSetup();
- 
+        arController = new ARController(480, 360, cameraParam);
+        arController.setPatternDetectionMode(artoolkit.AR_MATRIX_CODE_DETECTION);
+        arController.debugSetup();
+     
 
-	var camera_mat = arController.getCameraMatrix();
+        var camera_mat = arController.getCameraMatrix();
 
-	if (USE_SHADER) {
-		shaderMaterial.uniforms.cameraMatrix.value.elements.set(camera_mat);
-	} else {
-		camera.projectionMatrix.elements.set(camera_mat);
-	}
+        if (USE_SHADER) {
+            shaderMaterial.uniforms.cameraMatrix.value.elements.set(camera_mat);
+        } else {
+            camera.projectionMatrix.elements.set(camera_mat);
+        }
 
-};
-cameraParam.load('Data/camera_para.dat');
-
+    };
+    cameraParam.load('Data/camera_para.dat');
+}();
 
 </script>
 
