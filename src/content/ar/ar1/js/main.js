@@ -5,7 +5,7 @@
 *  that can be found in the LICENSE file in the root of the source
 *  tree.
 */
-function () {
+(function () {
     'use strict';
 
     var videoElement = document.querySelector('video');
@@ -74,4 +74,4 @@ function () {
     function handleError(error) {
       console.log('navigator.getUserMedia error: ', error);
     }
-}();
+})();
