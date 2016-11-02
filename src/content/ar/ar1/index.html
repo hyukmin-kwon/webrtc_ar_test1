@@ -163,16 +163,20 @@ function tick() {
 	if (markerNum > 0) {
         for (var i = 0; i < markerNum; i++) {
             var marker = arController.getMarker(i);
-            if (markerRoot.visible) {
-                arController.getTransMatSquareCont(i, 1, markerRoot.markerMatrix, markerRoot.markerMatrix);
+            if (marker.idMatrix === 1) {
+                if (markerRoot.visible) {
+                    arController.getTransMatSquareCont(i, 1, markerRoot.markerMatrix, markerRoot.markerMatrix);
+                } else {
+                    arController.getTransMatSquare(i /* Marker index */, 1 /* Marker width */, markerRoot.markerMatrix);
+                }
+                markerRoot.visible = true;
+                if (USE_SHADER) {
+                    arController.transMatToGLMat(markerRoot.markerMatrix, shaderMaterial.uniforms.transformationMatrix.value.elements);
+                } else {
+                    arController.transMatToGLMat(markerRoot.markerMatrix, markerRoot.matrix.elements);
+                }
             } else {
-                arController.getTransMatSquare(i /* Marker index */, 1 /* Marker width */, markerRoot.markerMatrix);
-            }
-            markerRoot.visible = true;
-            if (USE_SHADER) {
-                arController.transMatToGLMat(markerRoot.markerMatrix, shaderMaterial.uniforms.transformationMatrix.value.elements);
-            } else {
-                arController.transMatToGLMat(markerRoot.markerMatrix, markerRoot.matrix.elements);
+                markerRoot.visible = false;
             }
         }
 	} else {
