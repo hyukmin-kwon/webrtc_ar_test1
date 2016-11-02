@@ -190,7 +190,12 @@ var cameraParam = new ARCameraParam();
 cameraParam.onload = function() {
 
 	arController = new ARController(480, 360, cameraParam);
+    arController.setPatternDetectionMode(artoolkit.AR_MATRIX_CODE_DETECTION);
+    arController.addEventListener('getMarker', function(ev) {
+        var idMatrix = ev.data.marker.idMatrix;
+    });
 	arController.debugSetup();
+ 
 
 	var camera_mat = arController.getCameraMatrix();
 
