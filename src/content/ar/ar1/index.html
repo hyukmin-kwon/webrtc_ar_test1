@@ -156,6 +156,36 @@
     var arController = null;
 
 
+    // To display the video, first create a texture from it.
+    var videoTex = new THREE.VideoTexture(video);
+
+    // Use linear downscaling for videoTex
+    // (otherwise it needs to be power-of-two sized and you
+    // need to generate mipmaps, which are kinda useless here)
+    videoTex.minFilter = THREE.LinearFilter;
+
+    // And unflip the video Y-axis.
+    videoTex.flipY = false;
+
+    // Then create a plane textured with the video.
+    var plane = new THREE.Mesh(
+      new THREE.PlaneBufferGeometry(2, 2),
+      new THREE.MeshBasicMaterial({map: videoTex, side: THREE.DoubleSide})
+    );
+
+    // The video plane shouldn't care about the z-buffer.
+    plane.material.depthTest = false;
+    plane.material.depthWrite = false;
+
+    // Create a scene and a camera to draw the video.
+    var videoScene = new THREE.Scene();
+    var videoCamera = new THREE.OrthographicCamera(-1, 1, -1, 1, -1, 1);
+    videoScene.add(videoCamera);
+    videoScene.add(plane);
+
+    // Set the renderer autoClear to false, otherwise it
+    // clears the canvas before each render call.
+    renderer.autoClear = false;
 
     // On every frame do the following:
     function tick() {
@@ -193,6 +223,7 @@
         // Render the scene.
         renderer.autoClear = false;
         renderer.clear();
+        renderer.render(videoScene, videoCamera);
         renderer.render(scene, camera);
     }
 
